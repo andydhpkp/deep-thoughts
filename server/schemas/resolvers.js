@@ -12,6 +12,19 @@ A resolver can accept four arguments in the following order
 
 const resolvers = {
     Query: {
+        //context defined in server.js and utils/auth.js
+        me: async(parent, args, context) => {
+            if(context.user) {
+                const userData = await User.findOne({})
+                    .select('-__v -password')
+                    .populate('thoughts')
+                    .populate('friends')
+            
+                return userData
+            }
+            
+            throw new AuthenticationError('Not logged in')
+        },
         //parent is a placeholder parameter, we need something in that first parameter's spot so we can access the username argument
         //the ternary operator checks if username exists, if it does, we set params to an object with a username key set to that value. if it doesn't we simply return an empty object
         thoughts: async (parent, { username }) => {
